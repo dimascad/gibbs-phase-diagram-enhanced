@@ -784,7 +784,7 @@ def __(mo):
         start=300,
         stop=1500,
         step=10,
-        value=800,
+        value=600,
         label="Temperature (K) - UCST System",
         show_value=True
     )
@@ -794,20 +794,20 @@ def __(mo):
 
 @app.cell
 def __(temperature_slider_ucst):
-    # UCST Model parameters
+    # UCST Model parameters - Mirror of LCST but with inverted temperature dependence
     T_ucst = temperature_slider_ucst.value
     R_ucst = 8.314  # Gas constant
     
-    # Interaction parameters for UCST - need stronger interactions
-    omega_alpha_ucst = 25000  # J/mol - stronger interaction
-    omega_beta_ucst = 15000   # J/mol
+    # Same interaction parameters as LCST
+    omega_alpha_ucst = 15000  # J/mol - same as LCST alpha
+    omega_beta_ucst = 8000    # J/mol - same as LCST beta
     
     # Temperature-dependent reference energies for UCST behavior
-    # Note the positive temperature coefficients!
-    G0_A_alpha_ucst = 0
-    G0_B_alpha_ucst = -5000 + 10 * T_ucst  # Increases with T
-    G0_A_beta_ucst = -3000 + 8 * T_ucst    # Increases with T
-    G0_B_beta_ucst = -2000 + 9 * T_ucst    # Increases with T
+    # Simply invert the temperature dependence of LCST
+    G0_A_alpha_ucst = 0  # Reference state
+    G0_B_alpha_ucst = 1000 + 2*T_ucst  # Opposite sign from LCST (was -2*T)
+    G0_A_beta_ucst = 500 + 0.5*T_ucst  # Opposite sign from LCST (was -0.5*T)
+    G0_B_beta_ucst = 1500 + 1.5*T_ucst  # Opposite sign from LCST (was -1.5*T)
     
     return G0_A_alpha_ucst, G0_A_beta_ucst, G0_B_alpha_ucst, G0_B_beta_ucst, R_ucst, T_ucst, omega_alpha_ucst, omega_beta_ucst
 
@@ -836,13 +836,13 @@ def __(G0_A_alpha_ucst, G0_A_beta_ucst, G0_B_alpha_ucst, G0_B_beta_ucst, R_ucst,
     **Current Temperature: {T_ucst} K**
     
     **UCST Parameters:**
-    - ω_α = {omega_alpha_ucst/1000:.0f} kJ/mol
-    - ω_β = {omega_beta_ucst/1000:.0f} kJ/mol
-    - G°_B^α = -5.0 + 10T kJ/mol = {G0_B_alpha_ucst/1000:.1f} kJ/mol
-    - G°_A^β = -3.0 + 8T kJ/mol = {G0_A_beta_ucst/1000:.1f} kJ/mol
-    - G°_B^β = -2.0 + 9T kJ/mol = {G0_B_beta_ucst/1000:.1f} kJ/mol
+    - ω_α = {omega_alpha_ucst/1000:.0f} kJ/mol (same as LCST)
+    - ω_β = {omega_beta_ucst/1000:.0f} kJ/mol (same as LCST)
+    - G°_B^α = 1.0 + 2T kJ/mol = {G0_B_alpha_ucst/1000:.1f} kJ/mol
+    - G°_A^β = 0.5 + 0.5T kJ/mol = {G0_A_beta_ucst/1000:.1f} kJ/mol
+    - G°_B^β = 1.5 + 1.5T kJ/mol = {G0_B_beta_ucst/1000:.1f} kJ/mol
     
-    Notice how these reference energies **increase** with temperature, opposite to the LCST case!
+    Notice: These are exactly like LCST but with **opposite signs** on the temperature terms!
     """)
     return G_alpha_ucst, G_beta_ucst
 
@@ -943,14 +943,14 @@ def __(G_alpha_ucst, G_beta_ucst, GridSpec, Poly3DCollection, R_ucst, T_ucst, fs
     
     # Create 3D surfaces for UCST
     x_mesh_ucst = np.linspace(0.01, 0.99, 30)
-    T_mesh_ucst = np.linspace(300, 1200, 30)
+    T_mesh_ucst = np.linspace(300, 1500, 30)
     X_ucst, T_grid_ucst = np.meshgrid(x_mesh_ucst, T_mesh_ucst)
     
     # Calculate UCST 3D surfaces
     def calc_G_alpha_3d_ucst(x, temp):
         if x <= 0 or x >= 1:
             return np.inf
-        G0_B_alpha_temp = -5000 + 10 * temp
+        G0_B_alpha_temp = 1000 + 2 * temp  # Mirror of LCST with opposite sign
         G_mix = R_ucst * temp * (x * np.log(x) + (1-x) * np.log(1-x))
         G_ref = x * G0_B_alpha_temp
         G_excess = x * (1-x) * omega_alpha_ucst
@@ -959,8 +959,8 @@ def __(G_alpha_ucst, G_beta_ucst, GridSpec, Poly3DCollection, R_ucst, T_ucst, fs
     def calc_G_beta_3d_ucst(x, temp):
         if x <= 0 or x >= 1:
             return np.inf
-        G0_A_beta_temp = -3000 + 8 * temp
-        G0_B_beta_temp = -2000 + 9 * temp
+        G0_A_beta_temp = 500 + 0.5 * temp   # Mirror of LCST with opposite sign
+        G0_B_beta_temp = 1500 + 1.5 * temp  # Mirror of LCST with opposite sign
         G_mix = R_ucst * temp * (x * np.log(x) + (1-x) * np.log(1-x))
         G_ref = x * G0_B_beta_temp + (1-x) * G0_A_beta_temp
         G_excess = x * (1-x) * omega_beta_ucst
@@ -989,7 +989,7 @@ def __(G_alpha_ucst, G_beta_ucst, GridSpec, Poly3DCollection, R_ucst, T_ucst, fs
     ax_3d_ucst.add_collection3d(bottom_plane_ucst)
     
     # Calculate UCST phase diagram for shadow using proper common tangent construction
-    temperatures_shadow_ucst = np.linspace(300, 1200, 40)
+    temperatures_shadow_ucst = np.linspace(300, 1500, 40)
     x1_values_shadow_ucst = []
     x2_values_shadow_ucst = []
     valid_temps_shadow_ucst = []
@@ -1131,7 +1131,7 @@ def __(G_alpha_ucst, G_beta_ucst, GridSpec, Poly3DCollection, R_ucst, T_ucst, fs
     ax_3d_ucst.set_title('3D Gibbs Surface with Phase Diagram "Shadow" - UCST System', fontsize=12)
     ax_3d_ucst.view_init(elev=20, azim=-135)
     ax_3d_ucst.set_xlim(0, 1)
-    ax_3d_ucst.set_ylim(300, 1200)
+    ax_3d_ucst.set_ylim(300, 1500)
     ax_3d_ucst.set_zlim(z_bottom_ucst, max(np.max(G_alpha_surf_ucst), np.max(G_beta_surf_ucst)) + 2000)
     
     # 2D Gibbs plot
@@ -1198,7 +1198,7 @@ def __(G_alpha_ucst, G_beta_ucst, GridSpec, Poly3DCollection, R_ucst, T_ucst, fs
     ax_phase_ucst.set_ylabel('Temperature (K)', fontsize=10)
     ax_phase_ucst.set_title('Phase Diagram - UCST (Inverted)', fontsize=12)
     ax_phase_ucst.set_xlim(0, 1)
-    ax_phase_ucst.set_ylim(300, 1200)
+    ax_phase_ucst.set_ylim(300, 1500)
     ax_phase_ucst.legend(loc='upper center')
     ax_phase_ucst.grid(True, alpha=0.3)
     
