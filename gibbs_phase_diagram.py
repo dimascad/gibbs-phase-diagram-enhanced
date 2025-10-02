@@ -807,9 +807,10 @@ def __(temperature_slider_ucst):
     # At high T: positive (repulsive interactions, concave up)
     T_critical = 1100  # Critical temperature
     
-    # omega changes sign around critical temperature
-    omega_alpha_ucst = -20000 + 35*T_ucst  # Negative at low T, positive at high T
-    omega_beta_ucst = -12000 + 20*T_ucst   # Negative at low T, positive at high T
+    # omega must be NEGATIVE to create concave DOWN curves
+    # At T=900K, these should be negative!
+    omega_alpha_ucst = -30000 + 20*T_ucst  # Still negative at T=900
+    omega_beta_ucst = -25000 + 15*T_ucst   # Still negative at T=900
     
     # Simple reference energies - keep them like LCST
     G0_A_alpha_ucst = 0  # Reference state
@@ -844,14 +845,14 @@ def __(G0_A_alpha_ucst, G0_A_beta_ucst, G0_B_alpha_ucst, G0_B_beta_ucst, R_ucst,
     **Current Temperature: {T_ucst} K**
     
     **UCST Parameters:**
-    - ω_α = {omega_alpha_ucst/1000:.1f} kJ/mol (= -20 + 0.035T)
-    - ω_β = {omega_beta_ucst/1000:.1f} kJ/mol (= -12 + 0.020T)
+    - ω_α = {omega_alpha_ucst/1000:.1f} kJ/mol (= -30 + 0.020T)
+    - ω_β = {omega_beta_ucst/1000:.1f} kJ/mol (= -25 + 0.015T)
     - G°_B^α = 1.0 - 2T kJ/mol = {G0_B_alpha_ucst/1000:.1f} kJ/mol
     - G°_A^β = 0.5 - 0.5T kJ/mol = {G0_A_beta_ucst/1000:.1f} kJ/mol  
     - G°_B^β = 1.5 - 1.5T kJ/mol = {G0_B_beta_ucst/1000:.1f} kJ/mol
     
-    **Key: ω < 0 at low T → concave down → no phase separation**
-    **ω > 0 at high T → concave up → phase separation**
+    **Key: ω < 0 → attractive → concave DOWN curves → no common tangent**
+    **At {T_ucst}K: {"Concave DOWN - phases mix!" if omega_alpha_ucst < 0 else "Concave UP - phase separation"}**
     """)
     return G_alpha_ucst, G_beta_ucst
 
@@ -963,7 +964,7 @@ def __(G_alpha_ucst, G_beta_ucst, GridSpec, Poly3DCollection, R_ucst, T_ucst, fs
         G_mix = R_ucst * temp * (x * np.log(x) + (1-x) * np.log(1-x))
         G_ref = x * G0_B_alpha_temp
         # Temperature-dependent omega that changes sign
-        omega_alpha_temp = -20000 + 35*temp
+        omega_alpha_temp = -30000 + 20*temp
         G_excess = x * (1-x) * omega_alpha_temp
         return G_ref + G_mix + G_excess
     
@@ -975,7 +976,7 @@ def __(G_alpha_ucst, G_beta_ucst, GridSpec, Poly3DCollection, R_ucst, T_ucst, fs
         G_mix = R_ucst * temp * (x * np.log(x) + (1-x) * np.log(1-x))
         G_ref = x * G0_B_beta_temp + (1-x) * G0_A_beta_temp
         # Temperature-dependent omega that changes sign
-        omega_beta_temp = -12000 + 20*temp
+        omega_beta_temp = -25000 + 15*temp
         G_excess = x * (1-x) * omega_beta_temp
         return G_ref + G_mix + G_excess
     
