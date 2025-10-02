@@ -48,7 +48,7 @@ def __(temperature_slider):
     # Using a regular solution model
     
     T = temperature_slider.value
-    R = 8.314  # Gas constant J/molÂ·K
+    R = 8.314  # Gas constant J/mol·K
     
     # Interaction parameters (simplified)
     # Different for each phase to create realistic behavior
@@ -377,9 +377,9 @@ def __(
             ax_3d.add_collection3d(poly)
         
         # Add phase labels on bottom
-        ax_3d.text(0.05, 900, z_bottom + 1000, 'Î±', fontsize=14, color='blue', weight='bold')
-        ax_3d.text(0.95, 900, z_bottom + 1000, 'Î²', fontsize=14, color='red', weight='bold')
-        ax_3d.text(0.5, 700, z_bottom + 1000, 'Î± + Î²', fontsize=12, color='purple', weight='bold')
+        ax_3d.text(0.05, 900, z_bottom + 1000, '±', fontsize=14, color='blue', weight='bold')
+        ax_3d.text(0.95, 900, z_bottom + 1000, '²', fontsize=14, color='red', weight='bold')
+        ax_3d.text(0.5, 700, z_bottom + 1000, '± + ²', fontsize=12, color='purple', weight='bold')
     
     # Add vertical drop lines from current temperature
     if tangent_found and valid_temps_shadow:
@@ -408,8 +408,8 @@ def __(
     G_beta_line = [calc_G_beta_3d(x, T) for x in x_line]
     T_line = np.full_like(x_line, T)
     
-    ax_3d.plot(x_line, T_line, G_alpha_line, 'b-', linewidth=3, label='Î± phase (current T)')
-    ax_3d.plot(x_line, T_line, G_beta_line, 'r-', linewidth=3, label='Î² phase (current T)')
+    ax_3d.plot(x_line, T_line, G_alpha_line, 'b-', linewidth=3, label='± phase (current T)')
+    ax_3d.plot(x_line, T_line, G_beta_line, 'r-', linewidth=3, label='² phase (current T)')
     
     # Highlight the current temperature plane
     # Make sure it extends all the way down to the bottom plane
@@ -442,8 +442,8 @@ def __(
     G_beta_vals = [G_beta(x) for x in x_range]
     
     # Plot the curves
-    ax_2d.plot(x_range, G_alpha_vals, 'b-', linewidth=2, label='Î± phase')
-    ax_2d.plot(x_range, G_beta_vals, 'r-', linewidth=2, label='Î² phase')
+    ax_2d.plot(x_range, G_alpha_vals, 'b-', linewidth=2, label='± phase')
+    ax_2d.plot(x_range, G_beta_vals, 'r-', linewidth=2, label='² phase')
     
     # Plot common tangent if found
     if tangent_found:
@@ -563,11 +563,11 @@ def __(
     
     if valid_temps:
         # Plot the binodal curve
-        ax_phase.plot(x1_values, valid_temps, 'b-', linewidth=2, label='Î± phase boundary')
-        ax_phase.plot(x2_values, valid_temps, 'r-', linewidth=2, label='Î² phase boundary')
+        ax_phase.plot(x1_values, valid_temps, 'b-', linewidth=2, label='± phase boundary')
+        ax_phase.plot(x2_values, valid_temps, 'r-', linewidth=2, label='² phase boundary')
         
         # Fill the two-phase region
-        ax_phase.fill_betweenx(valid_temps, x1_values, x2_values, alpha=0.15, color='#9b59b6', label='Î± + Î²')
+        ax_phase.fill_betweenx(valid_temps, x1_values, x2_values, alpha=0.15, color='#9b59b6', label='± + ²')
         
         # Add horizontal tie lines to show the two-phase region structure
         # Sample every few temperatures to avoid clutter
@@ -579,12 +579,12 @@ def __(
         
         # Add labels for single-phase regions and two-phase region
         if x1_values:
-            # Position Î± label near the left boundary
-            ax_phase.text(min(x1_values) - 0.05, np.mean(valid_temps), 'Î±', fontsize=14, ha='center', color='blue')
-            # Position Î² label near the right boundary  
-            ax_phase.text(max(x2_values) + 0.05, np.mean(valid_temps), 'Î²', fontsize=14, ha='center', color='red')
-            # Add Î± + Î² label in the middle of the two-phase region
-            ax_phase.text(np.mean([np.mean(x1_values), np.mean(x2_values)]), np.mean(valid_temps), 'Î± + Î²', 
+            # Position ± label near the left boundary
+            ax_phase.text(min(x1_values) - 0.05, np.mean(valid_temps), '±', fontsize=14, ha='center', color='blue')
+            # Position ² label near the right boundary  
+            ax_phase.text(max(x2_values) + 0.05, np.mean(valid_temps), '²', fontsize=14, ha='center', color='red')
+            # Add ± + ² label in the middle of the two-phase region
+            ax_phase.text(np.mean([np.mean(x1_values), np.mean(x2_values)]), np.mean(valid_temps), '± + ²', 
                          fontsize=12, ha='center', color='purple')
         
         # Mark current temperature only between phase boundaries
@@ -692,7 +692,6 @@ def __(
 
 
 
-
 @app.cell
 def __(mo, tangent_found, x1_tangent, x2_tangent):
     mo.md(f"""
@@ -700,8 +699,8 @@ def __(mo, tangent_found, x1_tangent, x2_tangent):
 
     At the selected temperature:
     - Common tangent found: {"Yes" if tangent_found else "No"}
-    {f"- Î± phase composition: x_B = {x1_tangent:.3f}" if tangent_found else ""}
-    {f"- Î² phase composition: x_B = {x2_tangent:.3f}" if tangent_found else ""}
+    {f"- ± phase composition: x_B = {x1_tangent:.3f}" if tangent_found else ""}
+    {f"- ² phase composition: x_B = {x2_tangent:.3f}" if tangent_found else ""}
 
     The common tangent construction determines the equilibrium compositions of coexisting phases. When two phases coexist at equilibrium, they must have equal chemical potentials, which is represented geometrically by the common tangent line touching both Gibbs curves.
     """)
@@ -718,7 +717,7 @@ def __(mo):
     - **Y-axis**: Temperature (K)
     - **Z-axis**: Gibbs free energy (J/mol)
     
-    Each phase (Î± and Î²) forms its own 3D surface. The 2D plots you see are horizontal slices through these surfaces at constant temperature.
+    Each phase (± and ²) forms its own 3D surface. The 2D plots you see are horizontal slices through these surfaces at constant temperature.
     
     ## Understanding the Visualizations
     
@@ -744,492 +743,6 @@ def __(mo):
     - **High temperatures** (>1100K): Increased mixing due to entropy dominating
     
     Notice how the 3D surfaces get "flatter" at high temperatures - this is entropy smoothing out the energy differences!
-    """)
-    return
-
-# UCST Section to be inserted
-
-@app.cell
-def __(mo):
-    mo.md(r"""
-    ---
-    
-    ## Example 2: UCST (Upper Critical Solution Temperature) System
-    
-    Now let's explore a system with **inverted** phase behavior - where phase separation occurs at LOW temperatures instead of high temperatures.
-    
-    ### Gibbs Free Energy Equations
-    
-    The general form remains the same:
-    
-    **Î± phase:**
-    $$G_\alpha = x_B G_{B}^{\alpha} + (1-x_B) G_{A}^{\alpha} + RT[x_B \ln x_B + (1-x_B) \ln(1-x_B)] + x_B(1-x_B)\omega_\alpha$$
-    
-    **Î² phase:**  
-    $$G_\beta = x_B G_{B}^{\beta} + (1-x_B) G_{A}^{\beta} + RT[x_B \ln x_B + (1-x_B) \ln(1-x_B)] + x_B(1-x_B)\omega_\beta$$
-    
-    **The key difference is in the temperature dependence of reference energies:**
-    
-    For LCST (above): $G^0_i = a_i - b_i T$ (decreases with T)  
-    For UCST (below): $G^0_i = a_i + b_i T$ (increases with T)
-    
-    This sign change creates opposite phase behavior!
-    """)
-    return
-
-
-@app.cell
-def __(mo):
-    temperature_slider_ucst = mo.ui.slider(
-        start=300,
-        stop=1500,
-        step=10,
-        value=800,
-        label="Temperature (K) - UCST System",
-        show_value=True
-    )
-    temperature_slider_ucst
-    return (temperature_slider_ucst,)
-
-
-@app.cell
-def __(temperature_slider_ucst):
-    # UCST Model parameters
-    T_ucst = temperature_slider_ucst.value
-    R_ucst = 8.314  # Gas constant
-    
-    # Interaction parameters for UCST - need stronger interactions
-    omega_alpha_ucst = 25000  # J/mol - stronger interaction
-    omega_beta_ucst = 15000   # J/mol
-    
-    # Temperature-dependent reference energies for UCST behavior
-    # Note the positive temperature coefficients!
-    G0_A_alpha_ucst = 0
-    G0_B_alpha_ucst = -5000 + 10 * T_ucst  # Increases with T
-    G0_A_beta_ucst = -3000 + 8 * T_ucst    # Increases with T
-    G0_B_beta_ucst = -2000 + 9 * T_ucst    # Increases with T
-    
-    return G0_A_alpha_ucst, G0_A_beta_ucst, G0_B_alpha_ucst, G0_B_beta_ucst, R_ucst, T_ucst, omega_alpha_ucst, omega_beta_ucst
-
-
-@app.cell
-def __(G0_A_alpha_ucst, G0_A_beta_ucst, G0_B_alpha_ucst, G0_B_beta_ucst, R_ucst, T_ucst, mo, np, omega_alpha_ucst, omega_beta_ucst):
-    # UCST Gibbs energy functions
-    def G_alpha_ucst(x):
-        if x <= 0 or x >= 1:
-            return np.inf
-        G_mix = R_ucst * T_ucst * (x * np.log(x) + (1-x) * np.log(1-x))
-        G_ref = x * G0_B_alpha_ucst + (1-x) * G0_A_alpha_ucst
-        G_excess = x * (1-x) * omega_alpha_ucst
-        return G_ref + G_mix + G_excess
-    
-    def G_beta_ucst(x):
-        if x <= 0 or x >= 1:
-            return np.inf
-        G_mix = R_ucst * T_ucst * (x * np.log(x) + (1-x) * np.log(1-x))
-        G_ref = x * G0_B_beta_ucst + (1-x) * G0_A_beta_ucst
-        G_excess = x * (1-x) * omega_beta_ucst
-        return G_ref + G_mix + G_excess
-    
-    # Display current parameters
-    mo.md(f"""
-    **Current Temperature: {T_ucst} K**
-    
-    **UCST Parameters:**
-    - Ï‰_Î± = {omega_alpha_ucst/1000:.0f} kJ/mol
-    - Ï‰_Î² = {omega_beta_ucst/1000:.0f} kJ/mol
-    - GÂ°_B^Î± = -5.0 + 10T kJ/mol = {G0_B_alpha_ucst/1000:.1f} kJ/mol
-    - GÂ°_A^Î² = -3.0 + 8T kJ/mol = {G0_A_beta_ucst/1000:.1f} kJ/mol
-    - GÂ°_B^Î² = -2.0 + 9T kJ/mol = {G0_B_beta_ucst/1000:.1f} kJ/mol
-    
-    Notice how these reference energies **increase** with temperature, opposite to the LCST case!
-    """)
-    return G_alpha_ucst, G_beta_ucst
-
-
-@app.cell
-def __(G_alpha_ucst, G_beta_ucst, np):
-    # UCST Common tangent calculation
-    def dG_alpha_dx_ucst(x):
-        h = 1e-8
-        if x - h <= 0:
-            return (G_alpha_ucst(x + h) - G_alpha_ucst(x)) / h
-        elif x + h >= 1:
-            return (G_alpha_ucst(x) - G_alpha_ucst(x - h)) / h
-        else:
-            return (G_alpha_ucst(x + h) - G_alpha_ucst(x - h)) / (2 * h)
-    
-    def dG_beta_dx_ucst(x):
-        h = 1e-8
-        if x - h <= 0:
-            return (G_beta_ucst(x + h) - G_beta_ucst(x)) / h
-        elif x + h >= 1:
-            return (G_beta_ucst(x) - G_beta_ucst(x - h)) / h
-        else:
-            return (G_beta_ucst(x + h) - G_beta_ucst(x - h)) / (2 * h)
-    
-    return dG_alpha_dx_ucst, dG_beta_dx_ucst
-
-
-@app.cell
-def __(G_alpha_ucst, G_beta_ucst, dG_alpha_dx_ucst, dG_beta_dx_ucst, fsolve, np):
-    # Find common tangent for UCST
-    def tangent_condition_ucst(x_pair):
-        x1, x2 = x_pair
-        if x1 <= 0 or x1 >= 1 or x2 <= 0 or x2 >= 1:
-            return [1e10, 1e10]
-        if x1 >= x2:
-            return [1e10, 1e10]
-        
-        slope1 = dG_alpha_dx_ucst(x1)
-        slope2 = dG_beta_dx_ucst(x2)
-        slope_diff = slope1 - slope2
-        
-        y1 = G_alpha_ucst(x1)
-        y2 = G_beta_ucst(x2)
-        intercept_diff = (y2 - y1) / (x2 - x1) - slope1
-        
-        return [slope_diff, intercept_diff]
-    
-    # Try to find common tangent
-    try:
-        initial_guesses = [
-            [0.2, 0.8],
-            [0.15, 0.85],
-            [0.25, 0.75],
-            [0.1, 0.9],
-            [0.3, 0.7]
-        ]
-        
-        best_result_ucst = None
-        best_residual_ucst = float('inf')
-        
-        for guess_ucst in initial_guesses:
-            try:
-                result_ucst = fsolve(tangent_condition_ucst, guess_ucst, full_output=True)
-                x_solution_ucst, info_ucst, ier_ucst, msg_ucst = result_ucst
-                residual_ucst = np.sum(np.abs(tangent_condition_ucst(x_solution_ucst)))
-                
-                if residual_ucst < best_residual_ucst and 0 < x_solution_ucst[0] < x_solution_ucst[1] < 1:
-                    best_result_ucst = x_solution_ucst
-                    best_residual_ucst = residual_ucst
-            except:
-                continue
-        
-        if best_result_ucst is not None and best_residual_ucst < 0.1:
-            x1_tangent_ucst, x2_tangent_ucst = best_result_ucst
-            tangent_found_ucst = True
-        else:
-            x1_tangent_ucst, x2_tangent_ucst = None, None
-            tangent_found_ucst = False
-            
-    except:
-        x1_tangent_ucst, x2_tangent_ucst = None, None
-        tangent_found_ucst = False
-    
-    return tangent_condition_ucst, tangent_found_ucst, x1_tangent_ucst, x2_tangent_ucst
-
-
-@app.cell
-def __(G_alpha_ucst, G_beta_ucst, GridSpec, Poly3DCollection, R_ucst, T_ucst, fsolve, mo, np, plt, tangent_found_ucst, x1_tangent_ucst, x2_tangent_ucst, omega_alpha_ucst, omega_beta_ucst):
-    # Create UCST visualization using already imported tools
-    
-    # Create UCST visualization
-    fig_ucst = plt.figure(figsize=(20, 8))
-    gs_ucst = GridSpec(1, 3, width_ratios=[1.5, 1, 1], figure=fig_ucst)
-    
-    # 3D plot
-    ax_3d_ucst = fig_ucst.add_subplot(gs_ucst[0], projection='3d')
-    
-    # Create 3D surfaces for UCST
-    x_mesh_ucst = np.linspace(0.01, 0.99, 30)
-    T_mesh_ucst = np.linspace(300, 1200, 30)
-    X_ucst, T_grid_ucst = np.meshgrid(x_mesh_ucst, T_mesh_ucst)
-    
-    # Calculate UCST 3D surfaces
-    def calc_G_alpha_3d_ucst(x, temp):
-        if x <= 0 or x >= 1:
-            return np.inf
-        G0_B_alpha_temp = -5000 + 10 * temp
-        G_mix = R_ucst * temp * (x * np.log(x) + (1-x) * np.log(1-x))
-        G_ref = x * G0_B_alpha_temp
-        G_excess = x * (1-x) * omega_alpha_ucst
-        return G_ref + G_mix + G_excess
-    
-    def calc_G_beta_3d_ucst(x, temp):
-        if x <= 0 or x >= 1:
-            return np.inf
-        G0_A_beta_temp = -3000 + 8 * temp
-        G0_B_beta_temp = -2000 + 9 * temp
-        G_mix = R_ucst * temp * (x * np.log(x) + (1-x) * np.log(1-x))
-        G_ref = x * G0_B_beta_temp + (1-x) * G0_A_beta_temp
-        G_excess = x * (1-x) * omega_beta_ucst
-        return G_ref + G_mix + G_excess
-    
-    G_alpha_surf_ucst = np.zeros_like(X_ucst)
-    G_beta_surf_ucst = np.zeros_like(X_ucst)
-    
-    for i_ucst in range(len(T_mesh_ucst)):
-        for j_ucst in range(len(x_mesh_ucst)):
-            G_alpha_surf_ucst[i_ucst, j_ucst] = calc_G_alpha_3d_ucst(X_ucst[i_ucst, j_ucst], T_grid_ucst[i_ucst, j_ucst])
-            G_beta_surf_ucst[i_ucst, j_ucst] = calc_G_beta_3d_ucst(X_ucst[i_ucst, j_ucst], T_grid_ucst[i_ucst, j_ucst])
-    
-    # Plot surfaces
-    ax_3d_ucst.plot_surface(X_ucst, T_grid_ucst, G_alpha_surf_ucst, cmap='Blues', alpha=0.6, linewidth=0)
-    ax_3d_ucst.plot_surface(X_ucst, T_grid_ucst, G_beta_surf_ucst, cmap='Reds', alpha=0.6, linewidth=0)
-    
-    # Add bottom plane for shadow
-    z_bottom_ucst = -8000
-    
-    # Bottom plane
-    bottom_corners_ucst = [[0, 300, z_bottom_ucst], [1, 300, z_bottom_ucst], 
-                          [1, 1500, z_bottom_ucst], [0, 1500, z_bottom_ucst]]
-    bottom_plane_ucst = Poly3DCollection([bottom_corners_ucst], alpha=0.05, facecolor='lightgray', 
-                                       edgecolor='black', linewidth=1)
-    ax_3d_ucst.add_collection3d(bottom_plane_ucst)
-    
-    # Calculate UCST phase diagram for shadow using proper common tangent construction
-    temperatures_shadow_ucst = np.linspace(300, 1200, 40)
-    x1_values_shadow_ucst = []
-    x2_values_shadow_ucst = []
-    valid_temps_shadow_ucst = []
-    
-    # Function to find common tangent at each temperature
-    def find_ucst_common_tangent(temp):
-        def G_alpha_temp(x):
-            return calc_G_alpha_3d_ucst(x, temp)
-        
-        def G_beta_temp(x):
-            return calc_G_beta_3d_ucst(x, temp)
-        
-        def dG_alpha_temp(x):
-            h = 1e-8
-            if x - h <= 0:
-                return (G_alpha_temp(x + h) - G_alpha_temp(x)) / h
-            elif x + h >= 1:
-                return (G_alpha_temp(x) - G_alpha_temp(x - h)) / h
-            else:
-                return (G_alpha_temp(x + h) - G_alpha_temp(x - h)) / (2 * h)
-        
-        def dG_beta_temp(x):
-            h = 1e-8
-            if x - h <= 0:
-                return (G_beta_temp(x + h) - G_beta_temp(x)) / h
-            elif x + h >= 1:
-                return (G_beta_temp(x) - G_beta_temp(x - h)) / h
-            else:
-                return (G_beta_temp(x + h) - G_beta_temp(x - h)) / (2 * h)
-        
-        def tangent_cond(x_pair):
-            x1, x2 = x_pair
-            if x1 <= 0 or x1 >= 1 or x2 <= 0 or x2 >= 1 or x1 >= x2:
-                return [1e10, 1e10]
-            
-            slope1 = dG_alpha_temp(x1)
-            slope2 = dG_beta_temp(x2)
-            slope_diff = slope1 - slope2
-            
-            y1 = G_alpha_temp(x1)
-            y2 = G_beta_temp(x2)
-            intercept_diff = (y2 - y1) / (x2 - x1) - slope1
-            
-            return [slope_diff, intercept_diff]
-        
-        # Try multiple initial guesses
-        guesses = [[0.2, 0.8], [0.3, 0.7], [0.25, 0.75], [0.15, 0.85], [0.35, 0.65]]
-        best_sol = None
-        best_res = float('inf')
-        
-        for guess in guesses:
-            try:
-                sol = fsolve(tangent_cond, guess, full_output=True)
-                x_sol, info, ier, msg = sol
-                res = np.sum(np.abs(tangent_cond(x_sol)))
-                
-                if res < best_res and 0 < x_sol[0] < x_sol[1] < 1:
-                    best_sol = x_sol
-                    best_res = res
-            except:
-                continue
-        
-        if best_sol is not None and best_res < 0.01:
-            return best_sol[0], best_sol[1]
-        return None, None
-    
-    for temp_ucst in temperatures_shadow_ucst:
-        x1, x2 = find_ucst_common_tangent(temp_ucst)
-        if x1 is not None and x2 is not None:
-            x1_values_shadow_ucst.append(x1)
-            x2_values_shadow_ucst.append(x2)
-            valid_temps_shadow_ucst.append(temp_ucst)
-    
-    # Draw shadow phase boundaries
-    if len(valid_temps_shadow_ucst) > 0:
-        ax_3d_ucst.plot(x1_values_shadow_ucst, valid_temps_shadow_ucst, 
-                       [z_bottom_ucst]*len(x1_values_shadow_ucst), 
-                       'b-', linewidth=3, alpha=0.8)
-        ax_3d_ucst.plot(x2_values_shadow_ucst, valid_temps_shadow_ucst, 
-                       [z_bottom_ucst]*len(x2_values_shadow_ucst), 
-                       'r-', linewidth=3, alpha=0.8)
-        
-        # Fill shadow region
-        for i_fill_ucst in range(len(valid_temps_shadow_ucst)-1):
-            verts_ucst = [
-                [x1_values_shadow_ucst[i_fill_ucst], valid_temps_shadow_ucst[i_fill_ucst], z_bottom_ucst],
-                [x2_values_shadow_ucst[i_fill_ucst], valid_temps_shadow_ucst[i_fill_ucst], z_bottom_ucst],
-                [x2_values_shadow_ucst[i_fill_ucst+1], valid_temps_shadow_ucst[i_fill_ucst+1], z_bottom_ucst],
-                [x1_values_shadow_ucst[i_fill_ucst+1], valid_temps_shadow_ucst[i_fill_ucst+1], z_bottom_ucst]
-            ]
-            poly_ucst = Poly3DCollection([verts_ucst], alpha=0.2, facecolor='#9b59b6', edgecolor='none')
-            ax_3d_ucst.add_collection3d(poly_ucst)
-    
-    # Add current temperature components
-    if tangent_found_ucst and x1_tangent_ucst is not None and x2_tangent_ucst is not None:
-        # Calculate surface points
-        z1_surface_ucst = calc_G_alpha_3d_ucst(x1_tangent_ucst, T_ucst)
-        z2_surface_ucst = calc_G_beta_3d_ucst(x2_tangent_ucst, T_ucst)
-        
-        # Fading drop lines
-        n_segments_ucst = 15
-        for i_ucst in range(n_segments_ucst):
-            z_start_ucst = z1_surface_ucst - i_ucst * (z1_surface_ucst - z_bottom_ucst) / n_segments_ucst
-            z_end_ucst = z1_surface_ucst - (i_ucst + 1) * (z1_surface_ucst - z_bottom_ucst) / n_segments_ucst
-            alpha_val_ucst = 0.3 * (1 - i_ucst / n_segments_ucst)
-            ax_3d_ucst.plot([x1_tangent_ucst, x1_tangent_ucst], [T_ucst, T_ucst], 
-                           [z_start_ucst, z_end_ucst], 'g-', alpha=alpha_val_ucst, linewidth=1)
-            
-            z_start_ucst = z2_surface_ucst - i_ucst * (z2_surface_ucst - z_bottom_ucst) / n_segments_ucst
-            z_end_ucst = z2_surface_ucst - (i_ucst + 1) * (z2_surface_ucst - z_bottom_ucst) / n_segments_ucst
-            ax_3d_ucst.plot([x2_tangent_ucst, x2_tangent_ucst], [T_ucst, T_ucst], 
-                           [z_start_ucst, z_end_ucst], 'g-', alpha=alpha_val_ucst, linewidth=1)
-        
-        # Mark current T on bottom
-        ax_3d_ucst.plot([x1_tangent_ucst, x2_tangent_ucst], [T_ucst, T_ucst], 
-                       [z_bottom_ucst, z_bottom_ucst], 'g--', linewidth=2, alpha=0.8)
-    
-    # Current temperature slice
-    x_line_ucst = np.linspace(0.01, 0.99, 100)
-    G_alpha_line_ucst = [G_alpha_ucst(x) for x in x_line_ucst]
-    G_beta_line_ucst = [G_beta_ucst(x) for x in x_line_ucst]
-    T_line_ucst = np.full_like(x_line_ucst, T_ucst)
-    
-    ax_3d_ucst.plot(x_line_ucst, T_line_ucst, G_alpha_line_ucst, 'b-', linewidth=3)
-    ax_3d_ucst.plot(x_line_ucst, T_line_ucst, G_beta_line_ucst, 'r-', linewidth=3)
-    
-    # Temperature plane
-    z_max_ucst = max(np.max(G_alpha_surf_ucst), np.max(G_beta_surf_ucst)) + 5000
-    xx_ucst = np.array([0, 1, 1, 0])
-    yy_ucst = np.array([T_ucst, T_ucst, T_ucst, T_ucst])
-    zz_ucst = np.array([z_bottom_ucst, z_bottom_ucst, z_max_ucst, z_max_ucst])
-    verts_temp_ucst = [list(zip(xx_ucst, yy_ucst, zz_ucst))]
-    poly_temp_ucst = Poly3DCollection(verts_temp_ucst, alpha=0.15, facecolor='green', edgecolor='green', linewidth=1)
-    ax_3d_ucst.add_collection3d(poly_temp_ucst)
-    
-    ax_3d_ucst.set_xlabel('Composition (x_B)', fontsize=10)
-    ax_3d_ucst.set_ylabel('Temperature (K)', fontsize=10)
-    ax_3d_ucst.set_zlabel('G (J/mol)', fontsize=10)
-    ax_3d_ucst.set_title('3D Gibbs Surface with Phase Diagram "Shadow" - UCST System', fontsize=12)
-    ax_3d_ucst.view_init(elev=20, azim=-135)
-    ax_3d_ucst.set_xlim(0, 1)
-    ax_3d_ucst.set_ylim(300, 1200)
-    ax_3d_ucst.set_zlim(z_bottom_ucst, max(np.max(G_alpha_surf_ucst), np.max(G_beta_surf_ucst)) + 2000)
-    
-    # 2D Gibbs plot
-    ax_2d_ucst = fig_ucst.add_subplot(gs_ucst[1])
-    x_range_ucst = np.linspace(0.001, 0.999, 500)
-    G_alpha_vals_ucst = [G_alpha_ucst(x) for x in x_range_ucst]
-    G_beta_vals_ucst = [G_beta_ucst(x) for x in x_range_ucst]
-    
-    ax_2d_ucst.plot(x_range_ucst, G_alpha_vals_ucst, 'b-', linewidth=2, label='Î± phase')
-    ax_2d_ucst.plot(x_range_ucst, G_beta_vals_ucst, 'r-', linewidth=2, label='Î² phase')
-    
-    if tangent_found_ucst and x1_tangent_ucst is not None and x2_tangent_ucst is not None:
-        y1_ucst = G_alpha_ucst(x1_tangent_ucst)
-        y2_ucst = G_beta_ucst(x2_tangent_ucst)
-        ax_2d_ucst.plot([x1_tangent_ucst, x2_tangent_ucst], [y1_ucst, y2_ucst], 'g--', linewidth=2, label='Common tangent')
-        ax_2d_ucst.plot(x1_tangent_ucst, y1_ucst, 'go', markersize=8)
-        ax_2d_ucst.plot(x2_tangent_ucst, y2_ucst, 'go', markersize=8)
-        ax_2d_ucst.axvline(x=x1_tangent_ucst, color='g', linestyle=':', alpha=0.5)
-        ax_2d_ucst.axvline(x=x2_tangent_ucst, color='g', linestyle=':', alpha=0.5)
-    
-    ax_2d_ucst.set_xlabel('Composition (x_B)', fontsize=10)
-    ax_2d_ucst.set_ylabel('Gibbs Free Energy (J/mol)', fontsize=10)
-    ax_2d_ucst.set_title(f'2D Slice at T = {T_ucst} K', fontsize=12)
-    ax_2d_ucst.legend()
-    ax_2d_ucst.grid(True, alpha=0.3)
-    ax_2d_ucst.set_xlim(0, 1)
-    
-    # Dynamic y-limits
-    all_vals_ucst = G_alpha_vals_ucst + G_beta_vals_ucst
-    finite_vals_ucst = [v for v in all_vals_ucst if np.isfinite(v)]
-    if finite_vals_ucst:
-        y_min_ucst, y_max_ucst = min(finite_vals_ucst), max(finite_vals_ucst)
-        y_range_ucst = y_max_ucst - y_min_ucst
-        ax_2d_ucst.set_ylim(y_min_ucst - 0.1*y_range_ucst, y_max_ucst + 0.1*y_range_ucst)
-    
-    # Phase diagram
-    ax_phase_ucst = fig_ucst.add_subplot(gs_ucst[2])
-    
-    # Plot phase boundaries
-    if len(valid_temps_shadow_ucst) > 0:
-        ax_phase_ucst.plot(x1_values_shadow_ucst, valid_temps_shadow_ucst, 'b-', linewidth=2, label='Î± phase boundary')
-        ax_phase_ucst.plot(x2_values_shadow_ucst, valid_temps_shadow_ucst, 'r-', linewidth=2, label='Î² phase boundary')
-        ax_phase_ucst.fill_betweenx(valid_temps_shadow_ucst, x1_values_shadow_ucst, x2_values_shadow_ucst, 
-                                   alpha=0.2, color='#9b59b6', label='Î± + Î²')
-        
-        # Phase labels
-        mid_idx = len(valid_temps_shadow_ucst) // 2
-        ax_phase_ucst.text(0.05, valid_temps_shadow_ucst[mid_idx], 'Î±', fontsize=14, color='blue', weight='bold')
-        ax_phase_ucst.text(0.95, valid_temps_shadow_ucst[mid_idx], 'Î²', fontsize=14, color='red', weight='bold')
-        ax_phase_ucst.text(0.5, valid_temps_shadow_ucst[mid_idx], 'Î± + Î²', fontsize=12, color='purple', 
-                          weight='bold', ha='center')
-    
-    # Current temperature line with tangent points if found
-    if tangent_found_ucst and x1_tangent_ucst is not None and x2_tangent_ucst is not None:
-        ax_phase_ucst.plot([x1_tangent_ucst, x2_tangent_ucst], [T_ucst, T_ucst], 'g--', linewidth=2, 
-                          label=f'Current T = {T_ucst} K')
-        ax_phase_ucst.plot(x1_tangent_ucst, T_ucst, 'go', markersize=8)
-        ax_phase_ucst.plot(x2_tangent_ucst, T_ucst, 'go', markersize=8)
-    else:
-        ax_phase_ucst.axhline(y=T_ucst, color='green', linestyle='--', linewidth=2, alpha=0.7, 
-                             label=f'Current T = {T_ucst} K')
-    
-    ax_phase_ucst.set_xlabel('Composition (x_B)', fontsize=10)
-    ax_phase_ucst.set_ylabel('Temperature (K)', fontsize=10)
-    ax_phase_ucst.set_title('Phase Diagram - UCST (Inverted)', fontsize=12)
-    ax_phase_ucst.set_xlim(0, 1)
-    ax_phase_ucst.set_ylim(300, 1200)
-    ax_phase_ucst.legend(loc='upper center')
-    ax_phase_ucst.grid(True, alpha=0.3)
-    
-    plt.tight_layout()
-    fig_ucst
-    
-    return ax_2d_ucst, ax_3d_ucst, ax_phase_ucst, calc_G_alpha_3d_ucst, calc_G_beta_3d_ucst, fig_ucst, find_ucst_common_tangent, gs_ucst, valid_temps_shadow_ucst, x1_values_shadow_ucst, x2_values_shadow_ucst, z_bottom_ucst
-
-
-@app.cell
-def __(mo):
-    mo.md(r"""
-    ### Key Differences: LCST vs UCST
-    
-    1. **Phase Diagram Shape**:
-       - LCST: Dome shape (narrow at top, wide at bottom)
-       - UCST: Inverted dome (wide at top, narrow at bottom)
-    
-    2. **Temperature Behavior**:
-       - LCST: Phases separate MORE at high temperatures
-       - UCST: Phases separate MORE at low temperatures
-    
-    3. **Physical Interpretation**:
-       - LCST: Entropy of mixing cannot overcome unfavorable enthalpic interactions at high T
-       - UCST: Entropy drives mixing at high T, overcoming unfavorable interactions
-    
-    4. **Real Examples**:
-       - LCST: Water + triethylamine, polymer solutions
-       - UCST: Phenol + water, many metallic alloys
-    
-    The "shadow" visualization shows how both types emerge from the same fundamental thermodynamics - just with different temperature dependencies!
     """)
     return
 
