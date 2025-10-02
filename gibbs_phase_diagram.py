@@ -784,7 +784,7 @@ def __(mo):
         start=300,
         stop=1500,
         step=10,
-        value=600,
+        value=900,
         label="Temperature (K) - UCST System",
         show_value=True
     )
@@ -794,30 +794,28 @@ def __(mo):
 
 @app.cell
 def __(temperature_slider_ucst):
-    # UCST Model parameters - Simple inverted phase behavior
+    # UCST Model parameters - Concave down surfaces at low T
     T_ucst = temperature_slider_ucst.value
     R_ucst = 8.314  # Gas constant
     
-    # For UCST: Keep it simple - just flip what makes phases mix
-    # At low T: phases should mix (small effective omega)
-    # At high T: phases should separate (large effective omega)
-    # We'll use temperature-dependent interaction to achieve this
+    # For UCST: We need NEGATIVE excess Gibbs energy at low T
+    # This creates concave DOWN curves where no common tangent is possible
+    # As T increases, omega becomes less negative or positive
     
-    # Base interaction parameters - will be modified by temperature
-    omega_base = 15000  # J/mol
+    # Temperature-dependent interaction parameters
+    # At low T: negative (attractive interactions, concave down)
+    # At high T: positive (repulsive interactions, concave up)
+    T_critical = 1100  # Critical temperature
     
-    # Make omega effectively temperature dependent to invert behavior
-    # Low T → low effective omega → miscible
-    # High T → high effective omega → immiscible
-    T_factor = T_ucst / 900  # Normalize around middle temperature
-    omega_alpha_ucst = omega_base * T_factor
-    omega_beta_ucst = omega_base * 0.6 * T_factor  # Slight asymmetry like LCST
+    # omega changes sign around critical temperature
+    omega_alpha_ucst = -20000 + 35*T_ucst  # Negative at low T, positive at high T
+    omega_beta_ucst = -12000 + 20*T_ucst   # Negative at low T, positive at high T
     
-    # Keep reference energies simple like LCST
+    # Simple reference energies - keep them like LCST
     G0_A_alpha_ucst = 0  # Reference state
-    G0_B_alpha_ucst = 1000 - 2*T_ucst   # Same as LCST
-    G0_A_beta_ucst = 500 - 0.5*T_ucst    # Same as LCST
-    G0_B_beta_ucst = 1500 - 1.5*T_ucst   # Same as LCST
+    G0_B_alpha_ucst = 1000 - 2*T_ucst   
+    G0_A_beta_ucst = 500 - 0.5*T_ucst    
+    G0_B_beta_ucst = 1500 - 1.5*T_ucst   
     
     return G0_A_alpha_ucst, G0_A_beta_ucst, G0_B_alpha_ucst, G0_B_beta_ucst, R_ucst, T_ucst, omega_alpha_ucst, omega_beta_ucst
 
@@ -846,13 +844,14 @@ def __(G0_A_alpha_ucst, G0_A_beta_ucst, G0_B_alpha_ucst, G0_B_beta_ucst, R_ucst,
     **Current Temperature: {T_ucst} K**
     
     **UCST Parameters:**
-    - ω_α = {omega_alpha_ucst/1000:.1f} kJ/mol (temperature-dependent: 15 × T/900)
-    - ω_β = {omega_beta_ucst/1000:.1f} kJ/mol (temperature-dependent: 9 × T/900)
-    - G°_B^α = 1.0 - 2T kJ/mol = {G0_B_alpha_ucst/1000:.1f} kJ/mol (same as LCST)
-    - G°_A^β = 0.5 - 0.5T kJ/mol = {G0_A_beta_ucst/1000:.1f} kJ/mol (same as LCST)
-    - G°_B^β = 1.5 - 1.5T kJ/mol = {G0_B_beta_ucst/1000:.1f} kJ/mol (same as LCST)
+    - ω_α = {omega_alpha_ucst/1000:.1f} kJ/mol (= -20 + 0.035T)
+    - ω_β = {omega_beta_ucst/1000:.1f} kJ/mol (= -12 + 0.020T)
+    - G°_B^α = 1.0 - 2T kJ/mol = {G0_B_alpha_ucst/1000:.1f} kJ/mol
+    - G°_A^β = 0.5 - 0.5T kJ/mol = {G0_A_beta_ucst/1000:.1f} kJ/mol  
+    - G°_B^β = 1.5 - 1.5T kJ/mol = {G0_B_beta_ucst/1000:.1f} kJ/mol
     
-    Key difference: **Temperature-dependent ω** creates inverted behavior - phases mix at low T and separate at high T!
+    **Key: ω < 0 at low T → concave down → no phase separation**
+    **ω > 0 at high T → concave up → phase separation**
     """)
     return G_alpha_ucst, G_beta_ucst
 
@@ -960,23 +959,23 @@ def __(G_alpha_ucst, G_beta_ucst, GridSpec, Poly3DCollection, R_ucst, T_ucst, fs
     def calc_G_alpha_3d_ucst(x, temp):
         if x <= 0 or x >= 1:
             return np.inf
-        G0_B_alpha_temp = 1000 - 2 * temp  # Same as LCST
+        G0_B_alpha_temp = 1000 - 2 * temp
         G_mix = R_ucst * temp * (x * np.log(x) + (1-x) * np.log(1-x))
         G_ref = x * G0_B_alpha_temp
-        # Temperature-dependent omega for UCST behavior
-        omega_alpha_temp = 15000 * (temp / 900)
+        # Temperature-dependent omega that changes sign
+        omega_alpha_temp = -20000 + 35*temp
         G_excess = x * (1-x) * omega_alpha_temp
         return G_ref + G_mix + G_excess
     
     def calc_G_beta_3d_ucst(x, temp):
         if x <= 0 or x >= 1:
             return np.inf
-        G0_A_beta_temp = 500 - 0.5 * temp   # Same as LCST
-        G0_B_beta_temp = 1500 - 1.5 * temp  # Same as LCST
+        G0_A_beta_temp = 500 - 0.5 * temp
+        G0_B_beta_temp = 1500 - 1.5 * temp
         G_mix = R_ucst * temp * (x * np.log(x) + (1-x) * np.log(1-x))
         G_ref = x * G0_B_beta_temp + (1-x) * G0_A_beta_temp
-        # Temperature-dependent omega for UCST behavior
-        omega_beta_temp = 15000 * 0.6 * (temp / 900)
+        # Temperature-dependent omega that changes sign
+        omega_beta_temp = -12000 + 20*temp
         G_excess = x * (1-x) * omega_beta_temp
         return G_ref + G_mix + G_excess
     
